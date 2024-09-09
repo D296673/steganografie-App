@@ -25,42 +25,52 @@ namespace steganografie_App
 
         private async void VerbergTekstInAfbeelding_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new FileOpenPicker();
-            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-            picker.FileTypeFilter.Add(".png");
-            picker.FileTypeFilter.Add(".jpg");
-
-            StorageFile file = await picker.PickSingleFileAsync();
-            if (file != null)
+            if (TextInput.Text != string.Empty)
             {
-                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+
+                    var picker = new FileOpenPicker();
+                picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+                picker.FileTypeFilter.Add(".png");
+                picker.FileTypeFilter.Add(".jpg");
+
+                StorageFile file = await picker.PickSingleFileAsync();
+                if (file != null)
                 {
-                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(fileStream);
-                    PixelDataProvider pixelData = await decoder.GetPixelDataAsync();
-                    byte[] pixels = pixelData.DetachPixelData();
-
-                    string tekst = TextInput.Text;
-                    byte[] tekstBytes = Encoding.UTF8.GetBytes(tekst);
-                    tekstBytes = VoegEindMarkeringToe(tekstBytes);
-
-                    pixels = VerbergTekstInPixels(pixels, tekstBytes);
-
-                    var savePicker = new FileSavePicker();
-                    savePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-                    savePicker.FileTypeChoices.Add("PNG Image", new string[] { ".png" });
-                    savePicker.SuggestedFileName = "SteganografieAfbeelding";
-
-                    StorageFile saveFile = await savePicker.PickSaveFileAsync();
-                    if (saveFile != null)
-                    {
-                        using (IRandomAccessStream stream = await saveFile.OpenAsync(FileAccessMode.ReadWrite))
+                
+                        using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
                         {
-                            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-                            encoder.SetPixelData(decoder.BitmapPixelFormat, decoder.BitmapAlphaMode, decoder.PixelWidth, decoder.PixelHeight, decoder.DpiX, decoder.DpiY, pixels);
-                            await encoder.FlushAsync();
+                            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(fileStream);
+                            PixelDataProvider pixelData = await decoder.GetPixelDataAsync();
+                            byte[] pixels = pixelData.DetachPixelData();
+
+                            string tekst = TextInput.Text;
+                            byte[] tekstBytes = Encoding.UTF8.GetBytes(tekst);
+                            tekstBytes = VoegEindMarkeringToe(tekstBytes);
+
+                            pixels = VerbergTekstInPixels(pixels, tekstBytes);
+
+                            var savePicker = new FileSavePicker();
+                            savePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+                            savePicker.FileTypeChoices.Add("PNG Image", new string[] { ".png" });
+                            savePicker.SuggestedFileName = "SteganografieAfbeelding";
+
+                            StorageFile saveFile = await savePicker.PickSaveFileAsync();
+                            if (saveFile != null)
+                            {
+                                using (IRandomAccessStream stream = await saveFile.OpenAsync(FileAccessMode.ReadWrite))
+                                {
+                                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+                                    encoder.SetPixelData(decoder.BitmapPixelFormat, decoder.BitmapAlphaMode, decoder.PixelWidth, decoder.PixelHeight, decoder.DpiX, decoder.DpiY, pixels);
+                                    await encoder.FlushAsync();
+                                }
+                            }
                         }
                     }
+                    
                 }
+            else
+            {
+                OutputText.Text = "je moet eerst iets invullen";
             }
         }
 
