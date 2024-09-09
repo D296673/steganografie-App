@@ -34,3 +34,7 @@
 - Gebruik camelCase voor x:Name attributen en bindings in XAML, zoals x:Name="textInput".
 - zorg voor een duidelijke xaml indeling
 
+## commits 
+- zorg ervoor dat alle commits in het engels zijn
+- duidelijke en korte titel als je meer wilt beschrijven doe dat bij het beschrijven van de commit
+
